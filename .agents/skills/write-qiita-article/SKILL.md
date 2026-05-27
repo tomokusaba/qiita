@@ -191,6 +191,14 @@ flowchart TB
 
 - 画像を使う場合は Markdown の `![alt](URL)` 形式で挿入する。
 - **alt テキストを必ず書く**。意味のある説明にする。
+- 画像は原則としてこのリポジトリ内 `public/images/<記事basename>/` に配置する。
+- 記事本文では GitHub Raw URL を使って参照する。形式:
+
+```text
+https://raw.githubusercontent.com/tomokusaba/qiita/main/public/images/<記事basename>/<ファイル名>
+```
+
+- `https://example.com/...` のようなプレースホルダー URL のまま残さない。
 
 ### 4.6 リンク
 
@@ -262,6 +270,7 @@ flowchart TB
 - [ ] 見出し階層が `##` → `###` の順に整理されている
 - [ ] コードブロックすべてに言語名が付いている
 - [ ] 画像に意味のある alt テキストが付いている
+- [ ] 記事内画像が `public/images/<記事basename>/` に配置され、GitHub Raw URL で参照されている
 - [ ] Microsoft Learn / Docs / DevBlogs / TechCommunity へのリンクに `WT.mc_id=DT-MVP-5004827` が付いている
 - [ ] 引用ブロック `>` には出典が添えてある
 - [ ] `:::message` / `:::message alert` の使いすぎがない
@@ -286,9 +295,10 @@ flowchart TB
 
 4. 生成された `public/<basename>.md` のフロントマターを記入し、`id: null` / `updated_at: ""` のままにする。
 5. §2 の骨格に沿って見出しを先に書き、その後に本文を埋める。
-6. 図表・コード・引用を §4 §5 のルールで挿入する。
-7. §7 のチェックリストで仕上げる。
-8. ユーザーに公開可否を確認した上で、必要なら `npx qiita publish <basename>` を案内する（勝手に実行しない）。
+6. 画像を使う場合は `public/images/<basename>/` を作成し、画像を配置して GitHub Raw URL で本文に挿入する（`example.com` などの仮URLは使わない）。
+7. 図表・コード・引用を §4 §5 のルールで挿入する。
+8. §7 のチェックリストで仕上げる。
+9. ユーザーに公開可否を確認した上で、必要なら `npx qiita publish <basename>` を案内する（勝手に実行しない）。
 
 ---
 
