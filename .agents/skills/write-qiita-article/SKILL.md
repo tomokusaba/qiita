@@ -286,19 +286,20 @@ https://raw.githubusercontent.com/tomokusaba/qiita/main/public/images/<記事bas
 
 1. ユーザーから記事のテーマ・対象読者・目安の長さをヒアリングする。
 2. 記事の型（tech / idea）を決める。これは**構成上の分類**であり、Qiita フロントマターに `type` は追加しない。
-3. 20 文字の 16 進 basename を生成し、**Qiita CLI で**記事ファイルを作成する。例:
+3. Qiita CLI での記事ファイル生成は、まず [`qiita-cli-workflow`](../qiita-cli-workflow/SKILL.md) を参照して進める。
+4. 20 文字の 16 進 basename を生成し、**Qiita CLI で**記事ファイルを作成する。例:
 
    ```pwsh
    $basename = node -e "const fs=require('fs'); const path=require('path'); const crypto=require('crypto'); let id; do { id = crypto.randomBytes(10).toString('hex'); } while (fs.existsSync(path.join('public', `${id}.md`))); console.log(id)"
    npx qiita new $basename
    ```
 
-4. 生成された `public/<basename>.md` のフロントマターを記入し、`id: null` / `updated_at: ""` のままにする。
-5. §2 の骨格に沿って見出しを先に書き、その後に本文を埋める。
-6. 画像を使う場合は `public/images/<basename>/` を作成し、画像を配置して GitHub Raw URL で本文に挿入する（`example.com` などの仮URLは使わない）。
-7. 図表・コード・引用を §4 §5 のルールで挿入する。
-8. §7 のチェックリストで仕上げる。
-9. ユーザーに公開可否を確認した上で、必要なら `npx qiita publish <basename>` を案内する（勝手に実行しない）。
+5. 生成された `public/<basename>.md` のフロントマターを記入し、`id: null` / `updated_at: ""` のままにする。
+6. §2 の骨格に沿って見出しを先に書き、その後に本文を埋める。
+7. 画像を使う場合は `public/images/<basename>/` を作成し、画像を配置して GitHub Raw URL で本文に挿入する（`example.com` などの仮URLは使わない）。
+8. 図表・コード・引用を §4 §5 のルールで挿入する。
+9. §7 のチェックリストで仕上げる。
+10. ユーザーに公開可否を確認した上で、必要なら `npx qiita publish <basename>` を案内する（勝手に実行しない）。
 
 ---
 
