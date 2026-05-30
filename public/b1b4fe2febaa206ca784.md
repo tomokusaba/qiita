@@ -1,14 +1,14 @@
 ---
-title: "高校の離散数学からはじめる計算機科学入門 — オートマトン、チューリングマシン、そしてコンパイラへ"
+title: 高校の離散数学からはじめる計算機科学入門 — オートマトン、チューリングマシン、そしてコンパイラへ
 tags:
-  - 計算機科学
-  - オートマトン
-  - チューリングマシン
-  - コンパイラ
   - 初心者
+  - コンパイラ
+  - オートマトン
+  - 計算機科学
+  - チューリングマシン
 private: false
-updated_at: ""
-id: null
+updated_at: '2026-05-31T07:33:14+09:00'
+id: 723bb96150d76dbffad0
 organization_url_name: null
 slide: false
 ignorePublish: false
