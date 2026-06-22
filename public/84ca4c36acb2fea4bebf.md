@@ -7,9 +7,9 @@ tags:
   - Blazor
   - fluentui
 private: false
-updated_at: '2026-06-11T20:58:13+09:00'
+updated_at: '2026-06-22T18:53:31+09:00'
 id: 4446e4ab89b5eaa55987
-organization_url_name: null
+organization_url_name: FutureOne
 slide: false
 ignorePublish: false
 ---

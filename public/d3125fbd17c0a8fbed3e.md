@@ -7,9 +7,9 @@ tags:
   - アクセシビリティ
   - InclusiveDesign
 private: false
-updated_at: '2026-05-24T20:54:04+09:00'
+updated_at: '2026-06-22T19:05:31+09:00'
 id: 700d3b82dca3bfbb8945
-organization_url_name: null
+organization_url_name: FutureOne
 slide: false
 ignorePublish: false
 ---

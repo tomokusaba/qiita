@@ -7,9 +7,9 @@ tags:
   - 計算機科学
   - チューリングマシン
 private: false
-updated_at: '2026-05-31T07:33:14+09:00'
+updated_at: '2026-06-22T19:03:30+09:00'
 id: 723bb96150d76dbffad0
-organization_url_name: null
+organization_url_name: FutureOne
 slide: false
 ignorePublish: false
 ---

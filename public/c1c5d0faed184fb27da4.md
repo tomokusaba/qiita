@@ -7,9 +7,9 @@ tags:
   - WCAG
   - fluentui
 private: false
-updated_at: '2026-05-06T15:48:49+09:00'
+updated_at: '2026-06-22T19:07:50+09:00'
 id: c1c5d0faed184fb27da4
-organization_url_name: null
+organization_url_name: FutureOne
 slide: false
 ignorePublish: false
 ---

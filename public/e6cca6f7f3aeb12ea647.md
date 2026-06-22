@@ -5,9 +5,9 @@ tags:
   - ASP.NET_Core
   - GitHubCopilot
 private: false
-updated_at: '2025-06-17T22:18:34+09:00'
+updated_at: '2026-06-22T19:13:29+09:00'
 id: e6cca6f7f3aeb12ea647
-organization_url_name: null
+organization_url_name: FutureOne
 slide: false
 ignorePublish: false
 ---
