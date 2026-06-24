@@ -1,0 +1,485 @@
+---
+title: "Fluent UI 2 の Text を理解する — Link との違い・プリセット・アクセシビリティ・Fluent UI Blazor 5 との比較"
+tags:
+  - UI
+  - React
+  - アクセシビリティ
+  - Blazor
+  - fluentui
+private: false
+updated_at: ""
+id: null
+organization_url_name: null
+slide: false
+ignorePublish: false
+---
+
+## はじめに 🌟
+
+Fluent UI 2 の Text コンポーネントは、UI 上のプレーンテキストを統一されたタイポグラフィで表示するための基盤部品です。「テキストを表示するだけなら `<p>` タグや `<span>` で十分では？」と思う方もいるかもしれませんが、Fluent 2 デザインシステムが定めるフォントファミリー・サイズ・ウェイトのルールを一貫して適用するには、Text コンポーネントを使うのが最も確実です。
+
+この記事では、Fluent UI 2 の Text コンポーネントの役割を整理し、よく混同されがちな Link コンポーネントとの違いを丁寧に解説します。また、プリセット・レイアウト・アクセシビリティ・コンテンツ設計の要点を押さえたうえで、Fluent UI Blazor 5 の `FluentText` との API 比較も行います。
+
+参照した一次情報：
+
+- [Fluent UI 2 Text usage](https://fluent2.microsoft.design/components/web/react/core/text/usage?WT.mc_id=DT-MVP-5004827)
+- [Fluent UI Blazor 5 Text](https://fluentui-blazor-v5.azurewebsites.net/Text)
+- [Fluent UI 2 Link usage](https://fluent2.microsoft.design/components/web/react/core/link/usage?WT.mc_id=DT-MVP-5004827)
+
+## 今回のゴール ✅
+
+- ✅ Text コンポーネントがどのような役割を担うか理解する
+- ✅ Text と Link の違いを機能・ユースケースの両面から整理する
+- ✅ プリセット・レイアウト・アクセシビリティ・コンテンツ設計の要点を実装へ落とし込めるようにする
+- ✅ Fluent UI Blazor 5 の `FluentText` と Fluent UI 2 React Text の API 差を把握する
+
+## Fluent UI 2 とは
+
+Fluent UI 2 は、Microsoft Fluent 2 デザインシステムに沿って UI を設計・実装するための指針とコンポーネント群です。見た目の統一だけではなく、情報の優先順位、操作の一貫性、アクセシビリティ、コンテンツ表現まで含めて設計する点が核になります。
+
+Text コンポーネントはその中でも特に「表示」を担う最も基本的な部品であり、デザインシステムが定めるタイポグラフィのルールをコードに落とし込む際の起点となります。
+
+## Fluent UI 2 シリーズ一覧 📚
+
+本記事は Fluent UI 2 コンポーネントを体系的にまとめるシリーズの第 31 回です。全記事は以下のとおりです。
+
+| # | コンポーネント | 記事 |
+|---|---|---|
+| 1 | 🪗 Accordion | [記事を読む](https://qiita.com/tomokusaba/items/6a9a8bd2eb278cffb83b) |
+| 2 | 🍞 Breadcrumb | [記事を読む](https://qiita.com/tomokusaba/items/337b0de5fb5bd238c2a8) |
+| 3 | 🗂️ Card | [記事を読む](https://qiita.com/tomokusaba/items/d9b72ccddacd948aaec4) |
+| 4 | ☑️ Checkbox | [記事を読む](https://qiita.com/tomokusaba/items/6b43dddf9803786f01ed) |
+| 5 | 🔘 Button | [記事を読む](https://qiita.com/tomokusaba/items/14928a4a52850c4eb09f) |
+| 6 | 🏷️ Badge | [記事を読む](https://qiita.com/tomokusaba/items/1b334d303ed207f956c6) |
+| 7 | 👤 Avatar | [記事を読む](https://qiita.com/tomokusaba/items/db6f552e0e853d0ce0f2) |
+| 8 | 🗨️ Dialog | [記事を読む](https://qiita.com/tomokusaba/items/5dcfce6246b5f5017bec) |
+| 9 | ⌨️ Combobox | [記事を読む](https://qiita.com/tomokusaba/items/af200d11891210cfc03b) |
+| 10 | ♿ アクセシビリティ実装 | [記事を読む](https://qiita.com/tomokusaba/items/5603457cab9f2cbb1757) |
+| 11 | 🎨 色と WCAG | [記事を読む](https://qiita.com/tomokusaba/items/c1c5d0faed184fb27da4) |
+| 12 | 🏷️ Label | [記事を読む](https://qiita.com/tomokusaba/items/5fb6729fb6caa207f335) |
+| 13 | 💬 Popover | [記事を読む](https://qiita.com/tomokusaba/items/d5209f1b271ef9ad267e) |
+| 14 | ✏️ Input | [記事を読む](https://qiita.com/tomokusaba/items/0e2f80eff7e8afbb51ee) |
+| 15 | ➖ Divider | [記事を読む](https://qiita.com/tomokusaba/items/fd3a94940a76a3a08498) |
+| 16 | 🖼️ Image | [記事を読む](https://qiita.com/tomokusaba/items/6f522ad550c6a853e623) |
+| 17 | 📋 Menu | [記事を読む](https://qiita.com/tomokusaba/items/f2e681262a8e304981c8) |
+| 18 | 🧭 Nav | [記事を読む](https://qiita.com/tomokusaba/items/c323de23e753455eeb7c) |
+| 19 | 🔣 Icon | [記事を読む](https://qiita.com/tomokusaba/items/4446e4ab89b5eaa55987) |
+| 20 | 🔗 Link | [記事を読む](https://qiita.com/tomokusaba/items/bf6f2d4d6cd875042d2a) |
+| 21 | 📢 MessageBar | [記事を読む](https://qiita.com/tomokusaba/items/7152b61fdf418239bbb8) |
+| 22 | 🚪 Drawer | [記事を読む](https://qiita.com/tomokusaba/items/0ea1e4cdea16dcaaf97c) |
+| 23 | 📋 Field | [記事を読む](https://qiita.com/tomokusaba/items/f8adff1e4bdff753a8e4) |
+| 24 | 🪪 Persona | [記事を読む](https://qiita.com/tomokusaba/items/5ca07275ad4a3a685aee) |
+| 25 | 📊 Progress Bar | [記事を読む](https://qiita.com/tomokusaba/items/221c4b8bf08e8b700a84) |
+| 26 | 🔽 Dropdown | [記事を読む](https://qiita.com/tomokusaba/items/7f92dfabf9b32967b2f1) |
+| 27 | 🔘 Radio Group | [記事を読む](https://qiita.com/tomokusaba/items/65e2c45869018cd1f06d) |
+| 28 | ⭐ Rating | [記事を読む](https://qiita.com/tomokusaba/items/d3b54e147dec86ec7086) |
+| 29 | 🔍 Searchbox | [記事を読む](https://qiita.com/tomokusaba/items/47ecb093c6ffb2f5bebe) |
+| 30 | 🔡 Select | [記事を読む](https://qiita.com/tomokusaba/items/733d0c8e090821b6f0f1) |
+| 31 | 🔤 Text | 本記事 |
+
+## Text とは — コンポーネントの役割
+
+> Use the text component for plain text. For hypertext, try a link instead.
+> — [Fluent UI 2 Text usage](https://fluent2.microsoft.design/components/web/react/core/text/usage?WT.mc_id=DT-MVP-5004827)
+
+Text コンポーネントは、**プレーンテキストを Fluent 2 タイポグラフィのルールに従って表示する**ためのコンポーネントです。役割は明確で、「ナビゲーションを伴わない・インタラクティブでないテキストを表示すること」に特化しています。
+
+React での基本的な使い方は次のとおりです。
+
+```jsx
+import { Text } from '@fluentui/react-components';
+
+<Text>Hello, world!</Text>
+```
+
+デフォルトでは `<span>` 要素として出力されます。`as` prop を使うことで、`<p>`・`<h1>` など任意のセマンティック HTML タグに変更できます。
+
+```jsx
+<Text as="h1">ページタイトル</Text>
+<Text as="p">段落テキスト</Text>
+```
+
+## Text vs Link — 機能・ユースケースの違い 🔗
+
+Text と Link はどちらも「テキストを表示する」という点で似ていますが、目的とインタラクション設計が根本的に異なります。
+
+| 観点 | Text | Link |
+|------|------|------|
+| 💡 目的 | プレーンテキストの表示 | ナビゲーション（別 URL・別画面への遷移） |
+| 🖱️ インタラクション | なし（表示専用） | クリック / タップによる遷移 |
+| ♿ HTML 要素 | `span`（デフォルト）/ `as` で変更可 | `a` 要素として出力 |
+| 🎨 スタイル | ベーステキストスタイル | 下線 + テーマカラー（Inline link） |
+| 📌 使用場面 | 本文・見出し・ラベルなど | 外部リンク・ページ遷移・アンカーリンク |
+| ⚠️ 混在禁止 | アクションのトリガーに使わない | テキスト装飾目的で使わない |
+
+この区別は、実装の見た目だけでなくアクセシビリティに直結します。Link はスクリーンリーダーに「リンク」として読み上げられ、キーボード操作（Tab / Enter）でも遷移できる前提で設計されます。Text にはそのような期待がありません。
+
+:::message
+アクション（削除・送信など）のトリガーには Link ではなく **Button** を使います。Link は常に「場所への移動」です。
+:::
+
+Blazor での比較例を見てみましょう。
+
+```razor
+@* ナビゲーション用には FluentAnchor または FluentLink *@
+<FluentAnchor Href="https://example.com">外部サイトへ移動</FluentAnchor>
+
+@* 表示専用テキストには FluentText *@
+<FluentText>補足説明のテキストです。</FluentText>
+```
+
+## プリセット — Caption2 〜 Display の 10 種 🎨
+
+Fluent UI 2 は、よく使うテキストスタイルをあらかじめコンポーネントとして提供しています。これらを**プリセット**と呼びます。
+
+| プリセット名 | コンポーネント | 主な用途 |
+|-------------|--------------|---------|
+| Caption 2 | `<Caption2>` | 最小の補足テキスト、タイムスタンプ等 |
+| Caption 1 | `<Caption1>` | アイコンのラベル、図表キャプション |
+| Body 1 | `<Body1>` | 通常の本文テキスト（標準） |
+| Subtitle 2 | `<Subtitle2>` | セクションの小見出し |
+| Subtitle 1 | `<Subtitle1>` | サイドバーや補助的な見出し |
+| Title 3 | `<Title3>` | ページ内小タイトル |
+| Title 2 | `<Title2>` | ページ内中タイトル |
+| Title 1 | `<Title1>` | ページの主タイトル |
+| Large Title | `<LargeTitle>` | ヘッダー・ランディング系の大タイトル |
+| Display | `<Display>` | マーケティング・ヒーローエリア向け最大サイズ |
+
+```jsx
+import {
+  Caption2, Caption1,
+  Body1,
+  Subtitle2, Subtitle1,
+  Title3, Title2, Title1,
+  LargeTitle,
+  Display,
+} from '@fluentui/react-components';
+
+<Display>最大サイズのタイトル</Display>
+<LargeTitle>大タイトル</LargeTitle>
+<Title1>ページタイトル</Title1>
+<Body1>通常の本文テキストです。</Body1>
+<Caption1>補足情報や注記</Caption1>
+```
+
+:::message
+プリセットはフォントファミリー・サイズ・ウェイトを変更できません。これらをカスタマイズしたい場合は、`<Text>` コンポーネントを直接使って `font` / `size` / `weight` prop で調整します。
+:::
+
+:::message
+デザイン仕様の公式プリセットは上記 10 種ですが、`@fluentui/react-components` パッケージにはこの 10 種に加えて `Body2` および `Body1Strong`・`Body1Stronger`・`Caption1Strong`・`Caption1Stronger`・`Caption2Strong`・`Subtitle2Stronger` といった **Strong / Stronger バリアント**も含まれています。実装時にはパッケージの型定義も合わせて確認してください。
+:::
+
+## レイアウト 📐
+
+### font prop — フォントファミリーの指定
+
+`font` prop でフォントファミリーを切り替えられます。ほとんどの場面では Segoe UI（`base`）が最適です。コードスニペットや技術的な文字列を表示する場合は `monospace` を使います。
+
+```jsx
+<Text font="base">通常のテキスト（Segoe UI）</Text>
+<Text font="monospace">const value = 42;</Text>
+```
+
+`numeric` フォントは数字の整列表示を最適化するオプションです。表や集計画面で数値を縦に揃えたい場合に活用できます。
+
+### align prop — テキスト配置
+
+`align` prop でテキストの水平配置を変更できます。
+
+```jsx
+<Text align="start">左揃え（デフォルト）</Text>
+<Text align="center">中央揃え</Text>
+<Text align="end">右揃え</Text>
+<Text align="justify">両端揃え</Text>
+```
+
+:::message
+Web ページでは **justify（両端揃え）を避けることを推奨**します。一定の行長と不均一なスペーシングが組み合わさると、スキャンしにくくなる場合があります。特に日本語テキストでは読みにくさが増すことがあります。
+:::
+
+通常は `start`（左揃え）が最も読みやすく、`center` はヒーローや見出し、`end` はテーブルセル内の数値表示など限定的な場面で使います。
+
+## アクセシビリティ ♿
+
+### as prop — セマンティック HTML の生成
+
+Text コンポーネントはデフォルトで `<span>` を出力します。これは視覚的には問題ありませんが、スクリーンリーダーや検索エンジンの理解を助けるためには**セマンティックに適した HTML タグを選ぶ**ことが重要です。
+
+```jsx
+// 見出しには h1〜h6 を使う
+<Text as="h1">ページのメインタイトル</Text>
+<Text as="h2">セクション見出し</Text>
+
+// 段落には p を使う
+<Text as="p">本文の段落テキストです。複数の文が続く場合はこちらを使います。</Text>
+```
+
+この設定によって、スクリーンリーダーが「見出しレベル 1」「段落」などを正確に伝えられるようになります。
+
+### 太字・イタリックの注意点
+
+Fluent UI 2 の Text では `bold` や `italic` の設定も可能ですが、**視覚的なスタイルだけで意味を伝えることは避けるべき**です。
+
+> Avoid using the appearance of a font to convey meaning. Bold and italic text should be used only when necessary, as not all screen readers communicate when text is bold or italicized.
+> — [Fluent UI 2 Text usage](https://fluent2.microsoft.design/components/web/react/core/text/usage?WT.mc_id=DT-MVP-5004827)
+
+スクリーンリーダーは太字やイタリックをすべて読み上げるわけではありません。「この文字が太字だから重要」という前提は、支援技術を使うユーザーには伝わらないことがあります。
+
+重要なテキストを伝えたい場合は、`<strong>` や `<em>` といったセマンティックタグを使うか、テキストそのもので重要性を表現する設計が望ましいです。
+
+```jsx
+// 視覚スタイルのみ：スクリーンリーダーには意味が伝わらない場合あり
+<Text weight="bold">注意事項</Text>
+
+// セマンティックを含む：スクリーンリーダーに強調として伝わる
+<Text as="strong">注意事項</Text>
+```
+
+## コンテンツ設計 ✍️
+
+### テキストに意味を持たせる設計
+
+Text コンポーネントで表示するテキストを書く際、Fluent 2 のガイドラインが重視するのは「見た目」より「伝わる内容」です。
+
+実務で押さえておきたいポイントを以下に整理します。
+
+| 観点 | 推奨 | 避けたい例 |
+|------|------|-----------|
+| 🧠 情報の明確性 | 誰が読んでも意味が分かるテキスト | 略語・ジャーゴンを無説明で使う |
+| 📐 プリセット選択 | 情報の重みに合ったサイズを選ぶ | 装飾目的だけでサイズを変える |
+| 🎨 スタイル一貫性 | デザインシステムのプリセットを優先 | 一箇所だけ独自スタイルを入れる |
+| ♿ 構造表現 | `as` prop でセマンティックタグを設定 | 全テキストを `span` のままにする |
+| 🔗 リンクとの混在 | ナビゲーション要素は Link に切り出す | Text にクリックハンドラーを付ける |
+
+特に「Text にクリックハンドラーを付けてボタン的に使う」パターンでは、スクリーンリーダーが `role="button"` を認識できない可能性があります。インタラクションが必要な場合は Button コンポーネントを使いましょう。
+
+### プリセットによる情報階層の表現
+
+デザイン上の情報階層を作るには、プリセットの使い分けが有効です。
+
+```jsx
+<Display>製品名 — キャッチコピー</Display>
+<Title1>主要機能の概要</Title1>
+<Subtitle1>機能 A の詳細</Subtitle1>
+<Body1>
+  機能 A は、ユーザーが直感的に操作できるよう設計されています。
+</Body1>
+<Caption1>最終更新: 2026年6月</Caption1>
+```
+
+このように階層を作ることで、スクリーンリーダー利用者も情報の優先度を把握しやすくなります。
+
+続いて、ここまでの概念が Fluent UI Blazor 5 の `FluentText` API にどう対応するかを確認します（Blazor をご利用でない方は[まとめ](#まとめ)へスキップできます）。
+
+:::message
+この節は **Blazor 開発者向けの詳細比較**です。React のみご利用の方は[まとめ](#まとめ)へスキップできます。
+:::
+
+Fluent UI Blazor 5 の `FluentText` は、React 版の Text コンポーネントと基本的な設計思想を共有しつつ、Blazor 特有のパラメーター構成になっています。
+
+### API 対応表
+
+| 機能 | React (`Text`) | Blazor (`FluentText`) |
+|------|---------------|----------------------|
+| テキスト出力タグ | `as` prop（例: `"h1"`, `"p"`） | `As="@TextTag.H1"` など |
+| フォントファミリー | `font="base"` / `"monospace"` / `"numeric"` | `Font="TextFont.Base"` / `TextFont.Monospace` / `TextFont.Numeric` |
+| テキスト配置 | `align="start"` 等 | `Align="TextAlign.Start"` 等 |
+| ウェイト | `weight="bold"` 等 | `Weight="TextWeight.Bold"` 等 |
+| イタリック | `italic={true}` | `Italic="true"` |
+| 下線 | `underline={true}` | `Underline="true"` |
+| 取り消し線 | `strikethrough={true}` | `Strikethrough="true"` |
+| テキスト色 | なし（CSS / デザイントークンで対応） | `Color="Color.Primary"` 等 |
+| カスタムカラー | なし（CSS / デザイントークンで対応） | `CustomColor="gold"` |
+| サイズ直接指定 | `size` prop（数値） | `Size="TextSize.Size400"` 等 |
+| ブロック要素 | `block={true}` | `Block="true"` |
+| 折り返し禁止 | `wrap={false}`（デフォルト `true`） | `Nowrap="true"` |
+| テキスト省略 | `truncate={true}` | `Truncate="true"` |
+| プリセット | 専用コンポーネント（`<Body1>` 等） | `Size` + `Weight` の組み合わせ |
+
+### 特筆すべきパラメーターの比較
+
+**① Color パラメーター（Blazor 固有）**
+
+Blazor 版には `Color` パラメーターが用意されており、テーマトークンに対応した色を直接指定できます。
+
+```razor
+<FluentText Block="true" Color="Color.Primary">プライマリカラーのテキスト</FluentText>
+<FluentText Block="true" Color="Color.Warning">警告色のテキスト</FluentText>
+<FluentText Block="true" Color="Color.Disabled">無効状態のテキスト</FluentText>
+
+@* カスタムカラーも指定可能 *@
+<FluentText Block="true" Color="Color.Custom" CustomColor="gold">カスタムカラーのテキスト</FluentText>
+```
+
+React 版では CSS やデザイントークンを使って実現するものを、Blazor では型安全に指定できます。
+
+**② TextFont.Numeric**
+
+`TextFont.Numeric` は、数値の視覚的な整列を最適化するフォント設定です。テーブルや集計値を縦に揃えたい場面で活用できます。
+
+```razor
+<FluentText Block="true" Font="TextFont.Numeric">0123456789</FluentText>
+```
+
+**③ Strikethrough / Underline / Italic（両フレームワーク対応・Blazor は宣言的 API）**
+
+React 版でも `italic`・`underline`・`strikethrough` prop がサポートされています。Blazor 版の特徴は、これらを **boolean 型のパラメーターとして宣言的に** 付与できる点です。
+
+```razor
+<FluentText Block="true" Italic="true">
+    強調されたテキスト（イタリック）
+</FluentText>
+<FluentText Block="true" Underline="true">
+    読者の注意を引くテキスト（下線付き）
+</FluentText>
+<FluentText Block="true" Strikethrough="true">
+    廃止・無効になった情報（取り消し線）
+</FluentText>
+```
+
+React 版でも同様の prop が使えます。
+
+```jsx
+<Text italic>強調されたテキスト（イタリック）</Text>
+<Text underline>読者の注意を引くテキスト（下線付き）</Text>
+<Text strikethrough>廃止・無効になった情報（取り消し線）</Text>
+```
+
+:::message alert
+下線付きテキスト（Underline）はリンクと誤認されやすいため、慎重に使いましょう。アクセシビリティの観点から、下線はナビゲーション可能な要素に使うという慣習があります。
+:::
+
+**④ Truncate と Nowrap の組み合わせ**
+
+長いテキストを一定幅で省略表示したい場合、`Truncate="true"` と `Nowrap="true"` を組み合わせます。
+
+```razor
+<div style="width: 200px; overflow: hidden;">
+    <FluentText Truncate="true" Nowrap="true">
+        この長いテキストは幅に収まらない場合に省略記号で切り詰められます。
+    </FluentText>
+</div>
+```
+
+**⑤ Size パラメーター（Size100 〜 Size1000）**
+
+Blazor 版は `TextSize.Size100` から `TextSize.Size1000` まで 10 段階のサイズを提供します。これは React のプリセット（Caption2 〜 Display）に相当する階層表現を、より柔軟に行うための仕組みです。
+
+```razor
+<FluentText Block="true" Size="TextSize.Size200">Caption 相当のサイズ</FluentText>
+<FluentText Block="true" Size="TextSize.Size400">Body 相当のサイズ</FluentText>
+<FluentText Block="true" Size="TextSize.Size700">Title 相当のサイズ</FluentText>
+```
+
+### Blazor 版でのプリセット対応
+
+React 版には専用プリセットコンポーネント（`<Body1>`, `<Title1>` 等）がありますが、Blazor 版にはプリセットコンポーネントはありません。代わりに `Size` と `Weight` パラメーターを組み合わせて同等のスタイルを実現します。
+
+| React プリセット | Blazor での近似 |
+|-----------------|----------------|
+| `<Caption2>` | `Size="TextSize.Size100"` |
+| `<Caption1>` | `Size="TextSize.Size200"` |
+| `<Body1>` | `Size="TextSize.Size300"` |
+| `<Subtitle2>` | `Size="TextSize.Size400" Weight="TextWeight.Semibold"` |
+| `<Subtitle1>` | `Size="TextSize.Size500" Weight="TextWeight.Semibold"` |
+| `<Title3>` | `Size="TextSize.Size600" Weight="TextWeight.Semibold"` |
+| `<Title2>` | `Size="TextSize.Size700" Weight="TextWeight.Semibold"` |
+| `<Title1>` | `Size="TextSize.Size800" Weight="TextWeight.Semibold"` |
+| `<LargeTitle>` | `Size="TextSize.Size900" Weight="TextWeight.Semibold"` |
+| `<Display>` | `Size="TextSize.Size1000" Weight="TextWeight.Semibold"` |
+
+:::message
+上記の対応はあくまで近似です。厳密なフォントサイズは Fluent 2 デザインシステムの設計値を参照し、デザインチームと確認することをお勧めします。
+:::
+
+## Fluent UI Blazor 5 のタイポグラフィシステム 🖋️
+
+Fluent UI Blazor 5 のタイポグラフィは、Fluent 2 デザインシステムが定める **デザイントークン（CSS カスタムプロパティ）** を基盤にしています。`FluentText` の `Size` / `Weight` / `Font` パラメーターはそれぞれ対応する CSS 変数を参照しており、テーマを切り替えるだけで全体のタイポグラフィが一貫して更新されます。
+
+### タイプランプ（Type Ramp）
+
+Fluent 2 のタイプランプは 10 段階で定義されています。`TextSize` の各値が参照する CSS トークン・実際のサイズ・行高は以下のとおりです。
+
+| `TextSize` | CSS トークン | フォントサイズ | 行高 | React プリセット相当 |
+|------------|-------------|-------------|------|---------------------|
+| `Size100` | `--fontSizeBase100` | **10px** | 14px | `<Caption2>` |
+| `Size200` | `--fontSizeBase200` | **12px** | 16px | `<Caption1>` |
+| `Size300` | `--fontSizeBase300` | **14px** | 20px | `<Body1>` |
+| `Size400` | `--fontSizeBase400` | **16px** | 22px | — |
+| `Size500` | `--fontSizeBase500` | **20px** | 28px | `<Subtitle1>` |
+| `Size600` | `--fontSizeBase600` | **24px** | 32px | `<Title3>` |
+| `Size700` | `--fontSizeHero700` | **28px** | 36px | `<Title2>` |
+| `Size800` | `--fontSizeHero800` | **32px** | 40px | `<Title1>` |
+| `Size900` | `--fontSizeHero900` | **40px** | 52px | `<LargeTitle>` |
+| `Size1000` | `--fontSizeHero1000` | **68px** | 92px | `<Display>` |
+
+> 出典: [microsoft/fluentui — packages/tokens/src/global/fonts.ts](https://github.com/microsoft/fluentui/blob/main/packages/tokens/src/global/fonts.ts)
+
+:::message
+`Size100`〜`Size600` が `fontSizeBase*`（本文系）、`Size700`〜`Size1000` が `fontSizeHero*`（見出し系）トークンに対応しています。この境界を意識するとサイズ選択の判断がしやすくなります。
+:::
+
+### フォントファミリー（`TextFont`）
+
+`Font` パラメーターで指定できる 3 種のフォントファミリーと、実際に使用されるフォントスタックは以下のとおりです。
+
+| `TextFont` | CSS トークン | フォントスタック |
+|------------|-------------|----------------|
+| `Base` | `--fontFamilyBase` | Segoe UI, Segoe UI Web (West European), -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif |
+| `Monospace` | `--fontFamilyMonospace` | Consolas, Courier New, Courier, monospace |
+| `Numeric` | `--fontFamilyNumeric` | Bahnschrift, Segoe UI, -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif |
+
+`Base` は通常のテキストに使う標準フォントです。`Monospace` はコードスニペットに、`Numeric` は **Bahnschrift** を優先して数値の等幅表示を最適化します。テーブルや金額表示など、桁を縦に揃えたい場面で使います。
+
+```razor
+<FluentText Font="TextFont.Base">本文テキスト（Segoe UI）</FluentText>
+<FluentText Font="TextFont.Monospace">const x = 42;</FluentText>
+<FluentText Font="TextFont.Numeric">¥1,234,567</FluentText>
+```
+
+### フォントウェイト（`TextWeight`）
+
+| `TextWeight` | CSS トークン | `font-weight` 値 |
+|-------------|-------------|-----------------|
+| `Regular` | `--fontWeightRegular` | **400** |
+| `Medium` | `--fontWeightMedium` | **500** |
+| `Semibold` | `--fontWeightSemibold` | **600** |
+| `Bold` | `--fontWeightBold` | **700** |
+
+通常の本文には `Regular`（400）、強調には `Semibold`（600）を使うのが Fluent 2 のガイドラインに沿った選択です。`Bold`（700）は特に強調が必要な場面に限定して使います。
+
+### CSS カスタムプロパティを直接使う
+
+`FluentText` コンポーネントを使わずに独自の Razor/CSS からデザイントークンを参照したい場合は、CSS カスタムプロパティを直接使用できます。
+
+```razor
+<p style="font-size: var(--fontSizeBase300); line-height: var(--lineHeightBase300); font-family: var(--fontFamilyBase);">
+    デザイントークンを直接参照したテキスト
+</p>
+```
+
+:::message
+カスタムプロパティを直接使う場合も、テーマが切り替われば自動的に値が変わります。ただし `FluentText` コンポーネント経由のほうが、タイポグラフィの意図を明確に宣言でき、メンテナンス性が高くなります。
+:::
+
+## まとめ ✅
+
+Text コンポーネントは、Fluent 2 デザインシステムのタイポグラフィを一貫して実装するための基盤部品です。「プレーンテキストの表示には Text、ナビゲーションには Link」という明確な役割分担を守ることが、アクセシビリティの品質に直結します。
+
+冒頭に挙げた 4 つのゴールを踏まえて、記事全体の要点を整理します。
+
+1. **Text はプレーンテキスト専用** ← ゴール①②。クリックやナビゲーションを伴うなら Link または Button を使う
+2. **プリセット・レイアウト props（font / align）でタイポグラフィと情報階層を表現する** ← ゴール③。Caption2 〜 Display の 10 種のプリセットを活用し、カスタマイズが必要なときは `<Text>` に切り替える
+3. **`as` prop（Blazor では `As` パラメーター）** でセマンティック HTML を生成し、スクリーンリーダー対応を確保する ← ゴール③
+4. **太字・イタリックで意味を伝えることは避ける** ← ゴール③。スクリーンリーダーはスタイルを読み上げない場合がある
+5. **Blazor 版では `italic` / `underline` / `strikethrough` / `Color` など宣言的 API** が用意されており、型安全にリッチな表現が可能 ← ゴール④
+
+Text コンポーネントは地味に見えますが、タイポグラフィの一貫性とアクセシビリティの両立を支える縁の下の力持ちです。ぜひ積極的に活用してみてください。🎉
+
+## 出典
+
+- [Fluent UI 2 Text usage](https://fluent2.microsoft.design/components/web/react/core/text/usage?WT.mc_id=DT-MVP-5004827)
+- [Fluent UI Blazor 5 Text](https://fluentui-blazor-v5.azurewebsites.net/Text)
+- [Fluent UI 2 Link usage](https://fluent2.microsoft.design/components/web/react/core/link/usage?WT.mc_id=DT-MVP-5004827)
+- [microsoft/fluentui — fonts.ts（タイポグラフィトークン一次情報）](https://github.com/microsoft/fluentui/blob/main/packages/tokens/src/global/fonts.ts)
