@@ -1,0 +1,412 @@
+---
+title: Fluent UI 2 の Toolbar を理解する — Fluent UI Blazor 5 AppBar / Nav 比較とアクセシビリティ・コンテンツ設計
+tags:
+  - UI
+  - React
+  - Blazor
+  - fluentui
+  - アクセシビリティ
+private: false
+updated_at: ""
+id: null
+organization_url_name: null
+slide: false
+ignorePublish: false
+---
+
+## はじめに 🌟
+
+Fluent UI 2 の Toolbar は、今見ている画面や、いま進めている作業に対して頻繁に使う操作をまとめるためのコンポーネントです。  
+たとえばエディターの書式設定、一覧画面のフィルター切り替え、選択中アイテムへの即時アクションなど、「その場で何をしたいか」が明確な場面で力を発揮します。
+
+一方で、Fluent UI Blazor 5 には `Toolbar` という同名コンポーネントがありません。  
+そのため本記事では、近縁コンポーネントとして `FluentAppBar` と `FluentNav` を比較対象に置きつつ、どちらが Toolbar に近いのかを整理します。
+
+特に今回は、Toolbar のガイダンス、動作、レイアウト、アクセシビリティ、コンテンツ設計に焦点を当てます。  
+なかでもアクセシビリティとコンテンツは、見た目だけでは判断しにくいぶん、実装時に差が出やすい領域です。
+
+参照した公式情報はこちらです。
+
+- [Fluent UI 2 Toolbar usage](https://fluent2.microsoft.design/components/web/react/core/toolbar/usage)
+- [Fluent UI Blazor 5 AppBar](https://fluentui-blazor-v5.azurewebsites.net/AppBar)
+- [Fluent UI Blazor 5 Nav](https://fluentui-blazor-v5.azurewebsites.net/Nav)
+
+## Fluent UI 2 とは
+
+Fluent UI 2 は、Microsoft Fluent 2 デザインシステムに沿って UI を設計・実装するための考え方とコンポーネント群です。  
+見た目をそろえるだけでなく、どの操作を前面に出すか、どう並べると迷いにくいか、支援技術でどう伝わるかまで含めて設計します。
+
+Toolbar も同じです。  
+単にボタンを横並びにするのではなく、現在のビューやタスクに関連する行動を、迷わず・誤操作しにくく・読み上げ環境でも辿れる形で提示することが求められます。
+
+## これまでの Fluent UI 2 シリーズ 📚
+
+本記事は Fluent UI 2 解説シリーズの 1 本です。  
+公開済みの記事は次のとおりです。
+
+1. [Fluent UI 2 の Accordion を理解する — 情報設計・アクセシビリティ・React 実装](https://qiita.com/tomokusaba/items/6a9a8bd2eb278cffb83b)
+2. [Fluent UI 2 の Breadcrumb を理解する — Fluent UI Blazor 5 との対応とアクセシビリティ](https://qiita.com/tomokusaba/items/337b0de5fb5bd238c2a8)
+3. [Fluent UI 2 の Card を理解する — React と Fluent UI Blazor の違い](https://qiita.com/tomokusaba/items/d9b72ccddacd948aaec4)
+4. [Fluent UI 2 の Dropdown を理解する — Fluent UI Blazor 5 の近縁コンポーネント比較とアクセシビリティ](https://qiita.com/tomokusaba/items/7f92dfabf9b32967b2f1)
+5. [Fluent UI 2 の Checkbox を理解する — React と Fluent UI Blazor v5 の違い](https://qiita.com/tomokusaba/items/6b43dddf9803786f01ed)
+6. [Fluent UI 2 の Button を理解する — 種類・レイアウト・アクセシビリティ・Blazor 5 比較](https://qiita.com/tomokusaba/items/14928a4a52850c4eb09f)
+7. [Fluent UI 2 の Searchbox を理解する — Fluent UI Blazor 5 との比較とアクセシビリティ・コンテンツ設計](https://qiita.com/tomokusaba/items/47ecb093c6ffb2f5bebe)
+8. [Fluent UI 2 の Switch を理解する — Checkbox との違い、即時適用、アクセシビリティ実装](https://qiita.com/tomokusaba/items/3ec4910ba6e9cd8deeb8)
+9. [Fluent UI 2 の Label を理解する — Fluent UI Blazor 5 と比較するラベル設計の基礎](https://qiita.com/tomokusaba/items/5fb6729fb6caa207f335)
+10. [Fluent UI 2 の Popover を理解する — Fluent UI Blazor 5 との比較と Tooltip / Dialog の使い分け](https://qiita.com/tomokusaba/items/d5209f1b271ef9ad267e)
+11. [Fluent UI 2 の Divider を理解する — Fluent UI Blazor 5 との比較](https://qiita.com/tomokusaba/items/fd3a94940a76a3a08498)
+12. [Fluent UI 2 で始めるアクセシビリティ実装 — キーボード操作・支援技術・WCAG 2.1 の実践ガイド](https://qiita.com/tomokusaba/items/5603457cab9f2cbb1757)
+13. [Fluent UI 2 の Image を理解する — Fluent UI Blazor 5 と比較しながらレイアウトとアクセシビリティを整理する](https://qiita.com/tomokusaba/items/6f522ad550c6a853e623)
+14. [Fluent UI 2 の Rating を理解する — Fluent UI Blazor 5 と比較する評価 UI の設計とアクセシビリティ](https://qiita.com/tomokusaba/items/d3b54e147dec86ec7086)
+15. [Fluent UI 2 の Menu を理解する — Fluent UI Blazor 5 と比較するガイダンス・動作・アクセシビリティ](https://qiita.com/tomokusaba/items/f2e681262a8e304981c8)
+16. [Fluent UI 2 の Nav を理解する — ガイダンス・動作・レイアウト・アクセシビリティと Fluent UI Blazor 5 比較](https://qiita.com/tomokusaba/items/c323de23e753455eeb7c)
+17. [Fluent UI 2 の Icon を理解する — Fluent UI Blazor の FluentIcon 比較とアクセシビリティ](https://qiita.com/tomokusaba/items/4446e4ab89b5eaa55987)
+18. [Fluent UI 2 の Radio Group を理解する — Fluent UI Blazor 5 との比較・使い分け・アクセシビリティ](https://qiita.com/tomokusaba/items/65e2c45869018cd1f06d)
+19. [Fluent UI 2 の Text を理解する — Link との違い・プリセット・アクセシビリティ・Fluent UI Blazor 5 との比較](https://qiita.com/tomokusaba/items/8d59a4257f3d3230002e)
+20. [Fluent UI 2 の Link を理解する — Fluent UI Blazor 5 と比較するリンク設計とアクセシビリティ](https://qiita.com/tomokusaba/items/bf6f2d4d6cd875042d2a)
+21. [Fluent UI 2 の MessageBar を理解する — Fluent UI Blazor 5 と比較する機能・使用方法・アクセシビリティ](https://qiita.com/tomokusaba/items/7152b61fdf418239bbb8)
+22. [Fluent UI 2 の Avatar を整理しつつ Fluent UI Blazor 5 でどう実装するか](https://qiita.com/tomokusaba/items/db6f552e0e853d0ce0f2)
+23. [Fluent UI 2 の Badge を理解する — Fluent UI Blazor 5 との比較と実装ポイント](https://qiita.com/tomokusaba/items/1b334d303ed207f956c6)
+24. [Fluent UI 2 のアクセシビリティを色から読む ─ WCAG 2.1 と対比しながら整理する](https://qiita.com/tomokusaba/items/c1c5d0faed184fb27da4)
+25. [Fluent UI 2 の Tag を理解する — Badge との違い、Fluent UI Blazor 5 での実装戦略とアクセシビリティ](https://qiita.com/tomokusaba/items/cde32ec554277a611692)
+26. [Fluent UI 2 の Combobox を理解する — Fluent UI Blazor 5 との比較と使い分け](https://qiita.com/tomokusaba/items/af200d11891210cfc03b)
+27. [Fluent UI 2 の Field を理解する — Fluent UI Blazor 5 と比較する入力設計の基礎](https://qiita.com/tomokusaba/items/f8adff1e4bdff753a8e4)
+28. [Fluent UI 2 の Textarea を理解する — Input との違い・ガイダンス・アクセシビリティ・Fluent UI Blazor 5 比較](https://qiita.com/tomokusaba/items/f1bd203381707eb5139b)
+29. [Fluent UI 2 の Persona を理解する — ガイダンス・レイアウト・アクセシビリティ・Fluent UI Blazor 5 比較](https://qiita.com/tomokusaba/items/5ca07275ad4a3a685aee)
+30. [Fluent UI 2 の Dialog を理解する — React と Fluent UI Blazor 5 の違いと使い分け](https://qiita.com/tomokusaba/items/5dcfce6246b5f5017bec)
+
+## 今回のゴール ✅
+
+- Toolbar が「現在のビュー / タスクに対する頻出操作のまとまり」であることを理解する
+- Fluent UI Blazor 5 では `FluentAppBar` と `FluentNav` のどちらが近いかを整理する
+- Toolbar のガイダンス、動作、レイアウトの要点を押さえる
+- 特に重要なアクセシビリティとコンテンツ設計の注意点を実務目線で確認する
+
+## Fluent UI 2 Toolbar と Fluent UI Blazor 5 の比較
+
+結論から先に書くと、**Toolbar により近いのは `FluentAppBar` です**。  
+理由は、Toolbar が「現在のビューや作業に対するコマンド群」を扱うのに対し、`FluentNav` は「どこへ移動するか」という高レベルな道案内を担当するからです。
+
+`FluentNav` は重要な比較対象ではありますが、近いというよりは役割が違うことを確認するための対照として読むのが自然です。
+
+| 観点 | Fluent UI 2 Toolbar | Fluent UI Blazor 5 AppBar | Fluent UI Blazor 5 Nav |
+|------|------|------|------|
+| 🎯 主目的 | 現在のビュー / タスクに対する頻出アクション | アプリバー的な操作コンテナー | 主要セクションへのナビゲーション |
+| 🧭 操作の種類 | 書式変更、並べ替え、表示切替などのコマンド | コマンド項目やアプリ切替に近い項目 | 画面遷移、カテゴリ移動 |
+| 📦 置かれる場所 | 作業領域の近く | 画面上部 / 側面などのアプリバー領域 | サイドナビや主要導線 |
+| ↔️ レイアウト | 親幅に合わせて伸びるが 2 行には折り返さない | Horizontal / Vertical 両対応 | ナビゲーション構造に応じた縦並び中心 |
+| 📚 項目の意味 | 今いる文脈での操作 | 操作または主要アプリ項目 | wayfinding、現在地表示 |
+| 🧰 Overflow | 収まらない項目は overflow に送る | overflow popover を持てる | overflow 前提ではない |
+| ♿ アクセシビリティの焦点 | アイコン、ラベル、グルーピング、複数 toolbar の命名 | `Text` / `Tooltip` と構造化 | roving tabindex を含むナビ操作 |
+| 🧱 近さ | 基準 | かなり近い | 役割は別物 |
+
+### なぜ AppBar のほうが近いのか
+
+Toolbar の本質は、「いま扱っている対象に対して、頻繁に使う操作を並べること」です。  
+この点で `FluentAppBar` は、項目を並べて overflow に逃がし、必要なら Tooltip や検索付き popover を扱えるため、操作コンテナーとしての性格が近いです。
+
+一方の `FluentNav` は、公式ドキュメントでも高レベルな wayfinding を担うコンポーネントです。  
+つまり「何をするか」ではなく「どこへ行くか」を表す部品なので、Toolbar の代替としてそのまま当てると意味がずれてしまいます。
+
+:::message alert
+Toolbar を Nav で代用すると、コマンド群と画面遷移が混ざりやすくなります。  
+「その場で実行する操作」なのか、「別の場所へ移動する導線」なのかを先に分けるのが安全です。
+:::
+
+### 実装イメージの比較
+
+React 側では Toolbar はコマンド群として構成します。
+
+```tsx
+import {
+  Toolbar,
+  ToolbarButton,
+  ToolbarDivider,
+  ToolbarToggleButton,
+} from "@fluentui/react-components";
+
+export function EditorToolbar() {
+  return (
+    <Toolbar aria-label="Text formatting">
+      <ToolbarButton aria-label="Undo">Undo</ToolbarButton>
+      <ToolbarButton aria-label="Redo">Redo</ToolbarButton>
+      <ToolbarDivider />
+      <ToolbarToggleButton aria-label="Bold">Bold</ToolbarToggleButton>
+      <ToolbarToggleButton aria-label="Italic">Italic</ToolbarToggleButton>
+    </Toolbar>
+  );
+}
+```
+
+Blazor 側で近い構成に寄せるなら、まずは AppBar が候補になります。
+
+```razor
+<FluentAppBar Orientation="Orientation.Horizontal">
+    <FluentAppBarItem
+        Text="Undo"
+        Tooltip="Undo"
+        IconRest="@(new Icons.Regular.Size20.ArrowUndo())"
+        IconActive="@(new Icons.Filled.Size20.ArrowUndo())" />
+    <FluentAppBarItem
+        Text="Redo"
+        Tooltip="Redo"
+        IconRest="@(new Icons.Regular.Size20.ArrowRedo())"
+        IconActive="@(new Icons.Filled.Size20.ArrowRedo())" />
+    <FluentAppBarItem
+        Text="Bold"
+        Tooltip="Bold"
+        IconRest="@(new Icons.Regular.Size20.TextBold())"
+        IconActive="@(new Icons.Filled.Size20.TextBold())" />
+    <FluentAppBarItem
+        Text="Italic"
+        Tooltip="Italic"
+        IconRest="@(new Icons.Regular.Size20.TextItalic())"
+        IconActive="@(new Icons.Filled.Size20.TextItalic())" />
+</FluentAppBar>
+```
+
+Nav は次のように、あくまで導線として捉えるのが自然です。
+
+```razor
+<FluentNav>
+    <FluentNavItem Href="/home">Home</FluentNavItem>
+    <FluentNavItem Href="/documents">Documents</FluentNavItem>
+    <FluentNavCategory Id="settings" Title="Settings">
+        <FluentNavItem Href="/settings/profile">Profile</FluentNavItem>
+        <FluentNavItem Href="/settings/security">Security</FluentNavItem>
+    </FluentNavCategory>
+</FluentNav>
+```
+
+## Toolbar ガイダンス 🧭
+
+Fluent UI 2 の Toolbar ガイダンスで最初に押さえたいのは、Toolbar は何でも置ける棚ではないという点です。  
+置くべきなのは、現在のビューやタスクに関連し、しかも比較的よく使う操作です。
+
+要点をまとめると次のとおりです。
+
+1. 主作業を支える場所に置く  
+   テキスト編集ならエディターの近く、一覧操作なら一覧の近く、というように、視線と手の移動を短くします。
+2. 主作業を支えない Toolbar は隠せるようにする  
+   便利でも常時表示が必須でないなら、表示 / 非表示を切り替えられる余地を持たせます。
+3. 関連する操作を論理的にグルーピングする  
+   divider と余白を使って、視線のまとまりを作ります。
+4. 破壊的操作や状態に大きく影響する操作は離す  
+   たとえば `Delete` や `Publish` を、書式変更や軽い表示切替の隣に密集させないようにします。
+
+### どんな操作を置くと相性がよいか
+
+| 操作の種類 | Toolbar と相性 | 例 |
+|------|------|------|
+| ✍️ 現在編集中の内容に作用 | 高い | Bold、Italic、Undo、Redo |
+| 🔎 現在表示中の一覧に作用 | 高い | Filter、Sort、Density 切替 |
+| 🧪 ビュー状態の切替 | 高い | Grid view、List view |
+| 🗺 画面遷移 | 低い | Home、Settings、Reports |
+| 🚨 重大な結果を伴う操作 | 慎重に配置 | Delete、Publish、Reset |
+
+この表だけでも、Toolbar と Nav の違いが見えやすいはずです。  
+Toolbar は「いまの文脈に対する操作」、Nav は「別の文脈へ移動する導線」です。
+
+## Toolbar の動作 ⚡
+
+Toolbar の動作で重要なのは、**幅が足りなくなっても 2 行に折り返さない**ことです。  
+Toolbar は親コンテナーに合わせて伸びますが、2 行目に回るのではなく、収まりきらない項目を overflow へ送ります。
+
+### Overflow の考え方
+
+Fluent UI 2 では、収まりきらない場合に overflow utility を使い、最後の項目が overflow menu button になる形を想定しています。  
+これは単に省スペース化のためではなく、操作のまとまりと一貫性を保つためでもあります。
+
+また、overflow menu の中では、**アイコンだけで済ませず、テキストラベルも併記する**ことが推奨されています。  
+横並びではアイコンで認識できても、メニューに入った瞬間に文脈が薄れるためです。
+
+### 動作面での実務ポイント
+
+- 📏 項目数が増えそうなら、最初から overflow を前提に優先順位を決める
+- 🔚 最後の項目が overflow に変わる前提で、末尾近くに重要操作を置きすぎない
+- 🧾 overflow に入ったときも、アイコンだけでなくテキストで意味が分かるようにする
+- 🪓 破壊的操作は overflow に追いやれば安全、とは限らない。見つけにくさと誤操作防止の両方で考える
+
+Blazor 側でこれに近い設計を考える場合、`FluentAppBar` の overflow popover はかなり相性がよいです。  
+特に「横方向に並ぶコマンドが増えたときの退避先」という意味では、Nav より AppBar のほうが自然です。
+
+## Toolbar のレイアウト 📐
+
+Toolbar のレイアウトは、単に「横並びで見やすくする」だけではありません。  
+どの操作が近い仲間で、どこから先が別グループなのかをひと目で判断できることが重要です。
+
+### レイアウトの基本原則
+
+| 観点 | 推奨 | 理由 |
+|------|------|------|
+| ↔️ 行数 | 1 行を維持する | 操作位置が上下にぶれると探索コストが上がる |
+| 🧩 グループ化 | divider と余白で区切る | 視線のスキャンが速くなる |
+| ⚠️ 危険操作 | 他の操作から離す | 誤操作しにくくなる |
+| 📍 配置 | 主作業の近くに置く | 操作意図と結果の距離が短くなる |
+| 🫥 補助 Toolbar | 必要なら隠せるようにする | 情報密度を抑えられる |
+
+### AppBar / Nav とのレイアウト差
+
+`FluentAppBar` は Horizontal / Vertical の両方に対応しますが、Toolbar の典型像は横一列のコマンドバーです。  
+そのため、Blazor で Toolbar 的に使うなら、まず Horizontal を基本に考えるほうが Fluent UI 2 の期待に近づきます。
+
+一方の `FluentNav` は、カテゴリや選択状態を見せる縦方向の導線設計が中心です。  
+同じ「並ぶ UI」であっても、読み手が期待する意味が違います。
+
+## アクセシビリティ ♿（重要）
+
+Toolbar のアクセシビリティで大事なのは、ボタンが並んでいることではなく、**各操作の意味と関係が支援技術でも正しく伝わること**です。  
+とくに Toolbar は icon-only に寄りやすいため、視覚依存の設計にならないよう注意が必要です。
+
+### 1. 複数 Toolbar があるなら、それぞれに名前を付ける
+
+アプリ内に Toolbar が 1 本だけなら、文脈から意味が伝わることもあります。  
+ただし複数ある場合は、各 Toolbar に `aria-label` または `aria-labelledby` を与えて、どの Toolbar なのかを区別できるようにします。
+
+たとえば次のような違いです。
+
+- `Text formatting`
+- `Table actions`
+- `Comment tools`
+
+「Toolbar が 3 つある」という情報だけでは、読み上げ環境では役に立ちません。  
+何のための Toolbar かまで名付けることが必要です。
+
+### 2. icon-only は familiar icon + tooltip + aria-label で補う
+
+Toolbar ではスペース節約のために icon-only ボタンを使いたくなります。  
+ただし、Fluent UI 2 のガイダンスでも、見慣れたアイコンを使うこと、視覚ユーザーには tooltip を出すこと、スクリーンリーダーには `aria-label` を与えることが重要です。
+
+つまり、次の 3 点を同時に満たしたいです。
+
+| 観点 | 必要な配慮 | 例 |
+|------|------|------|
+| 👀 視覚ユーザー | familiar icon を選ぶ | Bold、Italic、Undo など |
+| 🖱 補助的な視覚ヒント | tooltip を付ける | `Bold`、`Insert link` |
+| 🗣 読み上げ | `aria-label` を付ける | `aria-label="Bold"` |
+
+とくに独自アイコンや抽象的なアイコンは危険です。  
+見た目がきれいでも、初見で意味が分からないなら、Toolbar の速度を下げてしまいます。
+
+### 3. Overflow に入ったら、アイコンだけにしない
+
+Toolbar 上ではアイコン主体でも成り立つことがあります。  
+しかし overflow menu に入ると、操作は「一覧の中の 1 項目」として読まれるため、**テキストラベルがないと意味が急に分かりにくくなります**。
+
+そのため、overflow では次を守ると安定します。
+
+- アイコン + テキストラベルの組み合わせにする
+- Toolbar 上の名称と overflow 内の名称を変えない
+- tooltip と menu label の語彙をむやみに分けない
+
+これは視覚ユーザーだけでなく、スクリーンリーダーや音声操作でも重要です。  
+同じ機能なのに、表示場所で呼び名が変わると認知負荷が上がります。
+
+### 4. グルーピングは見た目だけで終わらせない
+
+Toolbar の divider や余白は、視覚的な整理に有効です。  
+ただし本当に重要なのは、意味としてもグループが成立しているかです。
+
+たとえば次の並びは分かりやすいです。
+
+- Undo / Redo
+- Bold / Italic / Underline
+- Align left / Center / Align right
+- Delete / Publish
+
+逆に、書式変更と破壊的操作が交互に並ぶと、見た目でも読み上げでも意味の塊が崩れます。  
+視覚上の divider は、意味の構造を後から飾るものではなく、意味の構造を見える化するための手段として扱いたいです。
+
+### 5. Toolbar を隠すなら、到達手段も残す
+
+主作業を直接支えない Toolbar には、隠せる仕組みを持たせることがあります。  
+その場合は、単に非表示にするだけでなく、再表示の方法が分かること、キーボードや支援技術からも到達できることを忘れないようにします。
+
+たとえば「More tools」「Show formatting toolbar」のように、結果が分かるラベルを用意すると迷いにくいです。
+
+:::message alert
+Toolbar のアクセシビリティで崩れやすいのは、icon-only を増やしすぎることと、overflow に入れた途端にラベルを失うことです。  
+見えている人にだけ通じる UI になっていないか、常に確認したいです。
+:::
+
+## コンテンツ設計 ✍️（重要）
+
+Toolbar はボタンが主役に見えますが、実際には**ラベル設計が主役**です。  
+Fluent UI 2 のガイダンスでも、ラベルや tooltip は短く、結果が明確に伝わるように、sentence case で、文末の句読点なしで書くことが勧められています。
+
+### まず守りたい 4 つの原則
+
+1. 何が起きるかを短く言い切る  
+   `Save`、`Insert link`、`Sort by date` のように、結果が想像できる語を使います。
+2. sentence case を保つ  
+   `Sort by date` はよいですが、`Sort By Date` のような title case は避けます。
+3. 文末の句読点を付けない  
+   ボタンや tooltip に文章の終止感を持ち込まないほうが、UI として自然です。
+4. 場所が変わっても語彙を変えない  
+   Toolbar 上、tooltip、overflow menu で、同じ操作に別名を付けないようにします。
+
+### 良い例と避けたい例
+
+| 目的 | 良い例 | 避けたい例 | 理由 |
+|------|------|------|------|
+| ✍️ 書式変更 | `Bold` | `Make selected text bold` | 長すぎてスキャンしづらい |
+| 🔗 リンク挿入 | `Insert link` | `Click here to insert a hyperlink` | 操作説明になりすぎる |
+| 🔃 並べ替え | `Sort by date` | `Date sort option` | 結果が直感しにくい |
+| 🗑 削除 | `Delete` | `Remove this item permanently.` | 句点つきで重く、UI として長い |
+| 🫥 非表示 | `Hide toolbar` | `You can hide this toolbar` | 操作ではなく説明文になっている |
+
+### Tooltip とラベルの役割を分ける
+
+Toolbar 上では icon-only ボタンに tooltip を付けることがあります。  
+ただし tooltip は追加説明であって、本体ラベルの代用品ではありません。
+
+実務では次の整理が分かりやすいです。
+
+| 要素 | 役割 | 書き方 |
+|------|------|------|
+| 🔤 ラベル | 操作名そのもの | 短く、結果が分かる語 |
+| 💬 Tooltip | 視覚ユーザーへの補助 | ラベルと同語、または最小限の補足 |
+| 🗣 `aria-label` | 読み上げ名 | 視覚ラベルと一致させるのが基本 |
+
+つまり `Bold` という操作なら、tooltip だけ長文化して `Apply bold formatting to the selected content` とするより、まずは `Bold` を軸に揃えたほうが一貫します。
+
+### 破壊的操作は文言でも距離を取る
+
+Toolbar では、危険な操作をグループとして離すことが推奨されています。  
+それに加えて文言でも、ほかの軽い操作と同じノリにしないことが大切です。
+
+たとえば `Delete`、`Discard draft`、`Publish` のような語は、`Bold` や `Align left` と同じ密度で並べると重みが埋もれます。  
+位置だけでなく、ラベルの意味の重さでも「別グループ」であることを支えると安全です。
+
+### Overflow 後も一貫する文言にする
+
+Toolbar は幅の都合で overflow に入るため、最初から overflow 後の読みやすさまで含めて命名するのが実務的です。
+
+たとえば次のように考えると安定します。
+
+- Toolbar 上: `Bold`
+- Tooltip: `Bold`
+- Overflow menu: `Bold`
+
+あるいは
+
+- Toolbar 上: `Sort`
+- Tooltip: `Sort by date`
+- Overflow menu: `Sort by date`
+
+後者のように Toolbar 上で短縮する場合でも、overflow menu に入ったときに意味が分かるよう、最終形のラベルを先に決めるのがポイントです。
+
+## まとめ 📝
+
+Fluent UI 2 の Toolbar は、単なる横並びボタン群ではなく、現在の文脈に対する頻出操作を整理して提示するためのコンポーネントです。  
+Fluent UI Blazor 5 に同名コンポーネントはありませんが、近い役割を探すなら `FluentAppBar` が第一候補で、`FluentNav` は比較対象ではあっても代替本命ではありません。
+
+実装時は、次の 5 点を先に決めると破綻しにくいです。
+
+- Toolbar に置く操作は「いまのビュー / タスクに関係あるか」
+- 操作をどうグルーピングし、どこで区切るか
+- 幅不足時に何を overflow に送るか
+- icon-only / tooltip / `aria-label` をどう揃えるか
+- overflow 後も通用する短いラベルをどう付けるか
+
+この 5 点を押さえるだけで、Toolbar は見た目の整理ではなく、操作導線とアクセシビリティを両立した UI としてかなり安定します。
